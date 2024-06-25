@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.32.0 (HEAD)
+  labels:
+    io.kompose.service: reference-data
+  name: reference-data
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: reference-data
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.32.0 (HEAD)
+      labels:
+        io.kompose.network/traderx-localnet: "true"
+        io.kompose.service: reference-data
+    spec:
+      containers:
+        - args:
+            - npm
+            - run
+            - start
+          image: traderx.azurecr.io/reference-data
+          name: reference-data
+          ports:
+            - containerPort: 18085
+              hostPort: 18085
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /workspace
+              name: reference-data-claim0
+          workingDir: /reference-data
+      restartPolicy: Always
+      volumes:
+        - name: reference-data-claim0
+          persistentVolumeClaim:
+            claimName: reference-data-claim0

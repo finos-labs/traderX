@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.32.0 (HEAD)
+  labels:
+    io.kompose.service: web-front-end-angular
+  name: web-front-end-angular
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: web-front-end-angular
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.32.0 (HEAD)
+      labels:
+        io.kompose.network/traderx-localnet: "true"
+        io.kompose.service: web-front-end-angular
+    spec:
+      containers:
+        - args:
+            - npm
+            - run
+            - start
+          image: traderx.azurecr.io/web-front-end-angular
+          name: web-front-end-angular
+          ports:
+            - containerPort: 18093
+              hostPort: 18093
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /workspace
+              name: web-front-end-angular-claim0
+          workingDir: /web-front-end/angular
+      restartPolicy: Always
+      volumes:
+        - name: web-front-end-angular-claim0
+          persistentVolumeClaim:
+            claimName: web-front-end-angular-claim0

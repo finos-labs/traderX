@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.32.0 (HEAD)
+  labels:
+    io.kompose.service: trade-feed
+  name: trade-feed
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: trade-feed
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.32.0 (HEAD)
+      labels:
+        io.kompose.network/traderx-localnet: "true"
+        io.kompose.service: trade-feed
+    spec:
+      containers:
+        - args:
+            - npm
+            - run
+            - start
+          env:
+            - name: TRADE_FEED_PORT
+              value: "18086"
+          image: traderx.azurecr.io/trade-feed
+          name: trade-feed
+          ports:
+            - containerPort: 18086
+              hostPort: 18086
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /workspace
+              name: trade-feed-claim0
+          workingDir: /trade-feed
+      restartPolicy: Always
+      volumes:
+        - name: trade-feed-claim0
+          persistentVolumeClaim:
+            claimName: trade-feed-claim0

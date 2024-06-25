@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.32.0 (HEAD)
+  labels:
+    io.kompose.service: position-service
+  name: position-service
+spec:
+  ports:
+    - name: 18090-tcp
+      port: 18090
+      targetPort: 18090
+  selector:
+    io.kompose.service: position-service

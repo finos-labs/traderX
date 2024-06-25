@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.32.0 (HEAD)
+  labels:
+    io.kompose.service: position-service
+  name: position-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: position-service
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.32.0 (HEAD)
+      labels:
+        io.kompose.network/traderx-localnet: "true"
+        io.kompose.service: position-service
+    spec:
+      containers:
+        - args:
+            - ./gradlew
+            - bootRun
+          env:
+            - name: DATABASE_TCP_HOST
+              value: database
+            - name: POSITION_SERVICE_PORT
+              value: "18090"
+          image: traderx.azurecr.io/position-service
+          name: position-service
+          ports:
+            - containerPort: 18090
+              hostPort: 18090
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /workspace
+              name: position-service-claim0
+          workingDir: /position-service
+      restartPolicy: Always
+      volumes:
+        - name: position-service-claim0
+          persistentVolumeClaim:
+            claimName: position-service-claim0

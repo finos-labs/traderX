@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.32.0 (HEAD)
+  labels:
+    io.kompose.service: database
+  name: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: database
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.32.0 (HEAD)
+      labels:
+        io.kompose.network/traderx-localnet: "true"
+        io.kompose.service: database
+    spec:
+      containers:
+        - args:
+            - ./run.sh
+          image: traderx.azurecr.io/database
+          name: database
+          ports:
+            - containerPort: 18082
+              hostPort: 18082
+              protocol: TCP
+            - containerPort: 18083
+              hostPort: 18083
+              protocol: TCP
+            - containerPort: 18084
+              hostPort: 18084
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /workspace
+              name: database-claim0
+          workingDir: /database
+      restartPolicy: Always
+      volumes:
+        - name: database-claim0
+          persistentVolumeClaim:
+            claimName: database-claim0

@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.32.0 (HEAD)
+  labels:
+    io.kompose.service: people-service
+  name: people-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: people-service
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.32.0 (HEAD)
+      labels:
+        io.kompose.network/traderx-localnet: "true"
+        io.kompose.service: people-service
+    spec:
+      containers:
+        - args:
+            - /PeopleService.WebApi
+            - dotnet
+            - run
+          image: traderx.azurecr.io/people-service
+          name: people-service
+          ports:
+            - containerPort: 18089
+              hostPort: 18089
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /workspace
+              name: people-service-claim0
+          workingDir: /people-service
+      restartPolicy: Always
+      volumes:
+        - name: people-service-claim0
+          persistentVolumeClaim:
+            claimName: people-service-claim0

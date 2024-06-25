@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.32.0 (HEAD)
+  labels:
+    io.kompose.service: database
+  name: database
+spec:
+  ports:
+    - name: 18082-tcp
+      port: 18082
+      targetPort: 18082
+    - name: 18083-tcp
+      port: 18083
+      targetPort: 18083
+    - name: 18084-tcp
+      port: 18084
+      targetPort: 18084
+    - name: ingress
+      port: 80
+      targetPort: 18084
+  selector:
+    io.kompose.service: database

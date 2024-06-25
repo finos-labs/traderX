@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.32.0 (HEAD)
+  labels:
+    io.kompose.service: trade-processor
+  name: trade-processor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: trade-processor
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.32.0 (HEAD)
+      labels:
+        io.kompose.network/traderx-localnet: "true"
+        io.kompose.service: trade-processor
+    spec:
+      containers:
+        - args:
+            - ./gradlew
+            - bootRun
+          env:
+            - name: DATABASE_TCP_HOST
+              value: database
+            - name: TRADE_FEED_HOST
+              value: trade-feed
+          image: traderx.azurecr.io/trade-processor
+          name: trade-processor
+          ports:
+            - containerPort: 18091
+              hostPort: 18091
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /workspace
+              name: trade-processor-claim0
+          workingDir: /trade-processor
+      restartPolicy: Always
+      volumes:
+        - name: trade-processor-claim0
+          persistentVolumeClaim:
+            claimName: trade-processor-claim0

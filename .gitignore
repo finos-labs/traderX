@@ -453,3 +453,8 @@ obj/
 # End of https://www.toptal.com/developers/gitignore/api/dotnetcore,csharp
 
 sdk/**/launchSettings.json
+/terraform/.terraform.lock.hcl
+/terraform/.terraform.tfstate.lock.info
+/terraform/terraform.tfstate
+/terraform/terraform.tfstate.backup
+/terraform/.terraform
