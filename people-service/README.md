@@ -26,4 +26,4 @@ Visit the forwarded port `/swagger` to open the SwaggerUI.
 
 Example URL:
 
-`/People/GetPerson?LoginId=user01`
+`/People/GetPerson?LogonId=user01`
